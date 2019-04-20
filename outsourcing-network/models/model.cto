@@ -1,0 +1,109 @@
+/*
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+namespace org.pulse.outsourcing_network
+
+// BASE DEFINTIONS
+
+
+abstract participant Company identified by companyId {
+  o String companyId
+  o String name
+}
+
+// PARTY DEFINITIONS
+participant Outsourcer extends Company {
+}
+
+participant Outsourcee extends Company {
+}
+
+participant Transporter extends Company {
+}
+
+enum OrderStatus {
+  o CREATED
+  o OPENED
+  o CONFIRMED
+  o COMPLETED
+  o FINISHED
+}
+
+enum Operation {
+  o Paint
+  o Polish
+  o Cut
+  o Drill
+}
+
+
+asset Item identified by itemId {
+  o String itemId
+  o String itemName
+}
+
+asset Order identified by orderId {
+  o String orderId
+  o OrderStatus orderStatus
+  o Operation operation
+  o Double quantity
+  --> Outsourcer outsourcer
+  --> Outsourcee outsourcee  
+  --> Transporter transporter optional    
+  --> Item item
+}
+
+transaction PlaceOrder {
+  o String orderId
+  o Operation operation
+  o Double quantity
+  --> Outsourcer outsourcer
+  --> Outsourcee outsourcee  
+  --> Transporter transporter optional  
+  --> Item item
+}
+
+event PlaceOrderEvent {
+  o String orderId
+  o OrderStatus orderStatus
+  o Operation operation
+  o Double quantity
+  --> Outsourcer outsourcer
+  --> Outsourcee outsourcee  
+  --> Transporter transporter optional  
+  --> Item item
+}
+
+transaction UpdateOrderStatus {
+  o OrderStatus orderStatus
+  --> Order order
+}
+
+event UpdateOrderStatusEvent {
+  o OrderStatus orderStatus
+  o Order order
+}
+
+
+// DEMO SPECIFIC DEFINITIONS
+transaction SetupDemo {
+}
+
+event TestEvent {
+o String theMessage
+}
+
+transaction TestEventTransaction {
+}
+

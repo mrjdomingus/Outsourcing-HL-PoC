@@ -1,0 +1,133 @@
+/*
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+rule CompanySeeUpdateThemselvesOnly {
+  description: "Company can see and update their own record only"
+  participant(t): "org.pulse.outsourcing_network.Company"
+  operation: READ, UPDATE
+  resource(v): "org.pulse.outsourcing_network.Company"
+  condition: (v.getIdentifier() == t.getIdentifier())
+  action: ALLOW
+}
+
+rule OutsourcerCreateOrder{
+  description: "Only Outsourcer can place an Order"
+  participant: "org.pulse.outsourcing_network.Outsourcer"
+  operation: CREATE
+  resource: "org.pulse.outsourcing_network.PlaceOrder"
+  action: ALLOW
+}
+
+rule OutsourcerReadPlaceOrder{
+  description: "Outsourcer can read / change only their own PlaceOrder"
+  participant(p): "org.pulse.outsourcing_network.Outsourcer"
+  operation: READ
+  resource(v): "org.pulse.outsourcing_network.PlaceOrder"
+  condition: (v.outsourcer.getIdentifier() == p.getIdentifier())
+  action: ALLOW
+}
+
+rule OutsourcerSeeOnlyTheirOrder {
+  description: "Outsourcer can read / change only their own order"
+  participant(p): "org.pulse.outsourcing_network.Outsourcer"
+  operation: READ,UPDATE,CREATE
+  resource(o): "org.pulse.outsourcing_network.Order"
+  condition: (o.outsourcer.getIdentifier() == p.getIdentifier())
+  action: ALLOW
+}
+
+// Is below rule really necessary?
+rule OutsourcerReadOrderstatusCREATED {
+    description: "Outsourcer can access Orderstatus CREATED "
+    participant: "org.pulse.outsourcing_network.Outsourcer"
+    operation: READ
+    resource: "org.pulse.outsourcing_network.OrderStatus#CREATED"
+    action: ALLOW
+}
+
+rule OutsourceeUpdateOrder{
+  description: "Only Outsourcee can update an Order"
+  participant: "org.pulse.outsourcing_network.Outsourcee"
+  operation: CREATE
+  resource: "org.pulse.outsourcing_network.UpdateOrderStatus"
+  action: ALLOW
+}
+
+rule OutsourceeSeeOnlyTheirOrder {
+  description: "Outsourcee can read / change only their own order"
+  participant(p): "org.pulse.outsourcing_network.Outsourcee"
+  operation: READ,UPDATE
+  resource(o): "org.pulse.outsourcing_network.Order"
+  condition: (o.outsourcee.getIdentifier() == p.getIdentifier())
+  action: ALLOW
+}
+
+// Is below rule really necessary?
+rule OutsourceeReadOperation {
+    description: "Outsourcer can access Operation"
+    participant: "org.pulse.outsourcing_network.Outsourcee"
+    operation: READ
+    resource: "org.pulse.outsourcing_network.Operation"
+    action: ALLOW
+}
+
+// This does not appear to have the desired, try to solve this with programmatic access control
+rule OutsourceeDenyOrderstatusCREATED {
+    description: "Outsourcee is denied Orderstatus CREATED "
+    participant: "org.pulse.outsourcing_network.Outsourcee"
+    operation: READ
+    resource: "org.pulse.outsourcing_network.OrderStatus#CREATED"
+    action: DENY
+}
+
+rule CompaniesSeeEachOther {
+  description:  "All companies can see each other"
+  participant: "org.pulse.outsourcing_network.Company"
+  operation: READ
+  resource: "org.pulse.outsourcing_network.Company"
+  action: ALLOW
+}
+
+rule CompaniesReadItems {
+  description:  "All Companies can read Items"
+  participant: "org.pulse.outsourcing_network.Company"
+  operation: READ
+  resource: "org.pulse.outsourcing_network.Item"
+  action: ALLOW
+}
+
+
+rule SystemReadCreatePermission {
+  description:  "All companies can read / create in the system namespace"
+  participant: "org.pulse.outsourcing_network.Company"
+  operation: READ,CREATE
+  resource: "org.hyperledger.composer.system.**"
+  action: ALLOW
+}
+
+rule NetworkAdminUser {
+    description: "Grant business network administrators full access to user resources"
+    participant: "org.hyperledger.composer.system.NetworkAdmin"
+    operation: ALL
+    resource: "**"
+    action: ALLOW
+}
+
+rule NetworkAdminSystem {
+    description: "Grant business network administrators full access to system resources"
+    participant: "org.hyperledger.composer.system.NetworkAdmin"
+    operation: ALL
+    resource: "org.hyperledger.composer.system.**"
+    action: ALLOW
+}

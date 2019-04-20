@@ -1,0 +1,17 @@
+{
+  "name": "myevents",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "composer-client": "^0.20.1",
+    "composer-admin": "latest",
+    "composer-cli": "latest",
+    "composer-connector-embedded": "latest"
+  }
+}
